@@ -1,19 +1,24 @@
-// scrape the content of the article or paragraphs on a webpage
+// Scrape the content of the article or paragraphs within the bodyContent div
 function scrapeArticle() {
-    const articleContent = document.querySelectorAll("article, p");
+    const articleContainer = document.getElementById("bodyContent"); // Select the container
+    const articleContent = articleContainer.querySelectorAll("p"); // Get all <p> tags within the container
     let content = '';
 
     articleContent.forEach(p => {
-        content += p.innerText + ' ';
+        content += p.innerText + ' '; // Append each paragraph's text
     });
 
-    return content.trim();
+    return content.trim(); // Trim any extra whitespace
 }
 
-// listen for messages from the popup or background
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "scrapeContent") {
-        const content = scrapeArticle();
-        sendResponse({ content: content });
+console.log('Content script loaded!');
+
+// Listen for messages from the popup
+chrome.runtime.onInstalled.addListener((request, sender, sendResponse) => {
+    console.log("request action: ", request.action);
+    if (request.action === "scrapeContent") {
+        const scrapedContent = scrapeArticle(); // Call the scrapeArticle function
+        console.log("Scraped content:", scrapedContent); // Log the scraped content for debugging
+        sendResponse({ content: scrapedContent });
     }
 });
