@@ -1,28 +1,16 @@
 document.getElementById("summarize-btn").addEventListener("click", () => {
     chrome.tab.query({ active: true, currentWindow: true }, (tabs) => {
-        // executing scripting on current tab
-        chrome.scripting.executeScript({
-            target: { tabId: tabs[0].id },
-            function: scrapeAndSummarize
+        chrome.tabs.sendMessage(tabs[0].id, { action: "scrapeContent" }, (response) => {
+            if (response && response.content) {
+                summarizeWithChatGPT(response.content).then(summary => {
+                    document.getElementById('summary').textContent = summary;
+                });
+            } else {
+                document.getElementById('summary').textContent = "Failed to scrape content.";
+            }
         });
     });
 });
-
-async function scrapeAndSummarize() {
-    // scrape content from the page
-    const articleContent = document.querySelectorAll("article", "p");
-    let content = '';
-
-    articleContent.forEach(p => {
-        content += p.innerText + ' ';
-    });
-
-    // summarize with ai
-    const summary = await summarizeWithChatGPT(content);
-
-    // display summary in popup
-    document.getElementById("summary").innerHTML = summary;
-}
 
 async function summarizeWithChatGPT(content) {
     const response = await fetch('https://chatgpt-42.p.rapidapi.com/conversationgpt4-2', {
