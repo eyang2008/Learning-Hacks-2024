@@ -4,31 +4,26 @@ document.getElementById("summarize-btn").addEventListener("click", () => {
             console.error("No active tabs found");
             return;
         }
-        console.log("Active tab ID:", tabs[0].id);
-        chrome.scripting.executeScript({
-            target: {
-                tabId: tabs[0].id,
-            },
-            function: sendData
+
+        // Send message to the content script to scrape the content
+        chrome.tabs.sendMessage(tabs[0].id, { action: "scrapeContent" }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.error("Error sending message:", chrome.runtime.lastError.message);
+            } else {
+                // Log the response from content script
+                console.log("Response from content script:", response);
+
+                // Update popup HTML with the scraped content
+                if (response && response.content) {
+                    document.getElementById('summary').textContent = response.content;
+                } else {
+                    document.getElementById('summary').textContent = "Failed to scrape content.";
+                }
+            }
         });
     });
 });
 
-const sendData = async () => {
-    chrome.runtime.sendMessage({ action: "scrapeContent" }, function(response) {
-        console.log("Received response from content script:", response); // Log the response
-        if (chrome.runtime.lastError) {
-            console.error("Runtime error:", chrome.runtime.lastError);
-            document.getElementById('summary').textContent = "Error: " + chrome.runtime.lastError.message;
-            return;
-        }
-        if (response && response.content) {
-            document.getElementById('summary').textContent = response.content; // Display scraped content
-        } else {
-            document.getElementById('summary').textContent = "Failed to scrape content.";
-        }
-    });
-}
 
 /*
 async function summarizeWithChatGPT(content) {

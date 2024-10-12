@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+/*chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log(message.action);
     if (message.action === "scrapeContent") {
         console.log("hihi");
@@ -6,8 +6,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             target: { tabId: sender.tab.id },
             function: scrapeArticle
         }, (results) => {
-            console.log("Results from content script:", results); // Log the results
-            sendResponse({ content: results[0].result, recieved: true });
+            //console.log("Results from content script:", results); // Log the results
+            //console.log(results[0].result);
+            sendResponse({ response: results[0].result });
         });
     }
     return true; // Keep the message channel open for asynchronous response
@@ -24,4 +25,4 @@ function scrapeArticle() {
     });
 
     return content.trim(); // Trim any extra whitespace
-}
+}*/
