@@ -16,4 +16,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const content = scrapeArticle();
         sendResponse({ content: content });
     }
-})
+});
