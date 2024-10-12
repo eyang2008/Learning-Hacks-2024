@@ -1,5 +1,5 @@
 document.getElementById("summarize-btn").addEventListener("click", () => {
-    chrome.tab.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.sendMessage(tabs[0].id, { action: "scrapeContent" }, (response) => {
             if (response && response.content) {
                 summarizeWithChatGPT(response.content).then(summary => {
