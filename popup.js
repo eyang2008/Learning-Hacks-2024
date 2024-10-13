@@ -15,7 +15,11 @@ document.getElementById("summarize-btn").addEventListener("click", () => {
 
                 // Update popup HTML with the scraped content
                 if (response && response.content) {
-                    document.getElementById('summary').textContent = response.content;
+                    var result = summarizeWithChatGPT(response.content);
+                    result.then(function(summary) {
+                        console.log("GPT SUMMARY: ", summary);
+                        document.getElementById('summary').textContent = summary;
+                    });
                 } else {
                     document.getElementById('summary').textContent = "Failed to scrape content.";
                 }
@@ -24,35 +28,30 @@ document.getElementById("summarize-btn").addEventListener("click", () => {
     });
 });
 
-
-/*
 async function summarizeWithChatGPT(content) {
-    const response = await fetch('https://chatgpt-42.p.rapidapi.com/conversationgpt4-2', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-rapidapi-host': 'chatgpt-42.p.rapidapi.com',
-            'x-rapidapi-key': '9ce4fb5d5amshb768dd74c7e918ep1bf45cjsn48b2be24ab28'
-        },
-        body: JSON.stringify({
-            messages: [
-                { "role": "user", "content": content }
-            ],
-            system_prompt: "", 
-            temperature: 0.9, 
-            top_k: 5,
-            top_p: 0.9,
-            max_tokens: 256,
-            web_access: false
-        })
-    });
+    const apiKey = '';
+    const apiUrl = 'https://api.openai.com/v1/chat/completions';
 
-    const data = await response.json();
-    console.log(data); // Log the full response for debugging
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: [{ role: "user", content: `Summarize the following text as much as possible and try to complete the summary (no hanging sentences): ${content}` }],
+                max_tokens: 100
+            })
+        });
 
-    if (data.choices && data.choices.length > 0) {
-        return data.choices[0].message.content;
-    } else {
-        throw new Error("No choices returned from API");
+        const result = await response.json();
+        const summary = result.choices[0].message.content;
+        console.log("Summary: ", summary);
+        return summary;
+    } catch (error) {
+        console.error("Error summarizing content:", error);
+        return "Error summarizing content.";
     }
-}*/
+}
